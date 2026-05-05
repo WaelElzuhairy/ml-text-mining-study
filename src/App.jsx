@@ -13,7 +13,7 @@ export default function App() {
   const [selectedLecture, setSelected] = useState(1)
   const [rangeFrom, setRangeFrom]     = useState(1)
   const [rangeTo, setRangeTo]         = useState(8)
-  const [apiKey, setApiKey]           = useState('')
+  const [apiKey, setApiKey]           = useState(import.meta.env.VITE_GROQ_KEY || '')
   const [showApiModal, setShowApiModal] = useState(false)
   const [gameMode, setGameMode]       = useState('crossword') // crossword | tictactoe
 
@@ -32,15 +32,17 @@ export default function App() {
             <span className="text-[#9ba6b3] text-xs ml-2 hidden sm:inline">— Study Companion</span>
           </div>
         </div>
-        <button
-          onClick={() => setShowApiModal(true)}
-          className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg border transition-colors
-            ${apiKey
-              ? 'border-[#34d399]/40 text-[#34d399] hover:border-[#34d399]'
-              : 'border-[#f59e0b]/40 text-[#f59e0b] hover:border-[#f59e0b]'}`}
-        >
-          {apiKey ? '🔑 Groq key saved' : '🔑 Set Groq Key (free)'}
-        </button>
+        {!import.meta.env.VITE_GROQ_KEY && (
+          <button
+            onClick={() => setShowApiModal(true)}
+            className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg border transition-colors
+              ${apiKey
+                ? 'border-[#34d399]/40 text-[#34d399] hover:border-[#34d399]'
+                : 'border-[#f59e0b]/40 text-[#f59e0b] hover:border-[#f59e0b]'}`}
+          >
+            {apiKey ? '🔑 Groq key saved' : '🔑 Set Groq Key (free)'}
+          </button>
+        )}
       </header>
 
       <TabNav active={activeTab} onChange={setActiveTab} />
