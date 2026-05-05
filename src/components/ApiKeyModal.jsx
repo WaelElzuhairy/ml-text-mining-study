@@ -6,8 +6,8 @@ export default function ApiKeyModal({ onSave, onClose }) {
 
   function handleSave() {
     const trimmed = key.trim()
-    if (!trimmed.startsWith('sk-ant-')) {
-      setError('Key should start with sk-ant-…')
+    if (!trimmed.startsWith('gsk_')) {
+      setError('Key should start with gsk_…')
       return
     }
     onSave(trimmed)
@@ -19,15 +19,16 @@ export default function ApiKeyModal({ onSave, onClose }) {
       <div className="bg-[#161b22] border border-[#2a3140] rounded-2xl p-8 w-full max-w-md shadow-2xl fade-in">
         <div className="flex items-center gap-3 mb-2">
           <span className="text-2xl">🔑</span>
-          <h2 className="text-xl font-bold text-white">Anthropic API Key</h2>
+          <h2 className="text-xl font-bold text-white">Groq API Key</h2>
         </div>
         <p className="text-[#9ba6b3] text-sm mb-6">
-          Required for Games and Cases tabs. Your key is stored in memory only — never saved or sent anywhere except directly to Anthropic.
+          Required for Games and Cases tabs. Free forever at console.groq.com — no credit card needed.
+          Your key is stored in memory only and never saved anywhere.
         </p>
 
         <input
           type="password"
-          placeholder="sk-ant-api03-..."
+          placeholder="gsk_..."
           value={key}
           onChange={e => { setKey(e.target.value); setError('') }}
           onKeyDown={e => e.key === 'Enter' && handleSave()}
@@ -38,9 +39,10 @@ export default function ApiKeyModal({ onSave, onClose }) {
         {error && <p className="text-[#f87171] text-xs mb-3">{error}</p>}
 
         <p className="text-[#9ba6b3] text-xs mb-6">
-          Get a key at{' '}
-          <a href="https://console.anthropic.com" target="_blank" rel="noreferrer"
-             className="text-[#22d3ee] hover:underline">console.anthropic.com</a>
+          Get a free key at{' '}
+          <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer"
+             className="text-[#22d3ee] hover:underline">console.groq.com/keys</a>
+          {' '}— sign up with Google, no card required.
         </p>
 
         <div className="flex gap-3">

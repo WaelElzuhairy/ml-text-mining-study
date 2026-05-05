@@ -39,7 +39,7 @@ export default function App() {
               ? 'border-[#34d399]/40 text-[#34d399] hover:border-[#34d399]'
               : 'border-[#f59e0b]/40 text-[#f59e0b] hover:border-[#f59e0b]'}`}
         >
-          {apiKey ? '🔑 Key saved' : '🔑 Set API Key'}
+          {apiKey ? '🔑 Groq key saved' : '🔑 Set Groq Key (free)'}
         </button>
       </header>
 

@@ -1,31 +1,31 @@
-const API_URL = 'https://api.anthropic.com/v1/messages'
-const MODEL = 'claude-sonnet-4-20250514'
+const API_URL = 'https://api.groq.com/openai/v1/chat/completions'
+const MODEL = 'llama-3.3-70b-versatile'
 
-async function callClaude(apiKey, systemPrompt, userMessage, maxTokens = 1000) {
+async function callGroq(apiKey, systemPrompt, userMessage, maxTokens = 1000) {
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
+      'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
       model: MODEL,
       max_tokens: maxTokens,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }],
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userMessage },
+      ],
     }),
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    throw new Error(err?.error?.message || `API error ${res.status}`)
+    throw new Error(err?.error?.message || `Groq API error ${res.status}`)
   }
   const data = await res.json()
-  return data.content[0].text
+  return data.choices[0].message.content
 }
 
-// Generate crossword clues: returns [{term, clue, direction?}]
+// Generate crossword clues: returns [{term, clue}]
 export async function generateCrosswordPairs(apiKey, lectureContent) {
   const system = `You are an NLP professor creating a crossword puzzle for students.
 Return ONLY valid JSON — no markdown, no explanation.`
@@ -50,7 +50,7 @@ Return JSON array ONLY:
   ...
 ]`
 
-  const text = await callClaude(apiKey, system, user, 1000)
+  const text = await callGroq(apiKey, system, user, 1000)
   const jsonMatch = text.match(/\[[\s\S]*\]/)
   if (!jsonMatch) throw new Error('Invalid response from AI')
   return JSON.parse(jsonMatch[0])
@@ -80,7 +80,7 @@ Return JSON array ONLY (exactly 9 items):
   ...
 ]`
 
-  const text = await callClaude(apiKey, system, user, 800)
+  const text = await callGroq(apiKey, system, user, 800)
   const jsonMatch = text.match(/\[[\s\S]*\]/)
   if (!jsonMatch) throw new Error('Invalid response from AI')
   return JSON.parse(jsonMatch[0])
@@ -110,7 +110,7 @@ Return JSON ONLY:
   "expectedConcepts": ["concept1", "concept2", "concept3", "concept4", "concept5"]
 }`
 
-  const text = await callClaude(apiKey, system, user, 600)
+  const text = await callGroq(apiKey, system, user, 600)
   const jsonMatch = text.match(/\{[\s\S]*\}/)
   if (!jsonMatch) throw new Error('Invalid response from AI')
   return JSON.parse(jsonMatch[0])
@@ -145,7 +145,7 @@ Return JSON ONLY:
   "feedback": "1-2 sentence overall constructive comment"
 }`
 
-  const text = await callClaude(apiKey, system, user, 800)
+  const text = await callGroq(apiKey, system, user, 800)
   const jsonMatch = text.match(/\{[\s\S]*\}/)
   if (!jsonMatch) throw new Error('Invalid response from AI')
   return JSON.parse(jsonMatch[0])
@@ -163,7 +163,7 @@ Is the student's answer correct? Accept minor spelling variations, abbreviations
 Return JSON ONLY:
 {"correct": true, "feedback": "Brief explanation"}`
 
-  const text = await callClaude(apiKey, system, user, 100)
+  const text = await callGroq(apiKey, system, user, 100)
   const jsonMatch = text.match(/\{[\s\S]*\}/)
   if (!jsonMatch) return { correct: false, feedback: 'Could not validate' }
   return JSON.parse(jsonMatch[0])
