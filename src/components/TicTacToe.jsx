@@ -170,6 +170,11 @@ export default function TicTacToe({ apiKey, rangeFrom, rangeTo, onNeedApiKey }) 
           <div className="text-2xl font-black text-[#f87171]">{score.O}</div>
           <div className="text-xs text-[#9ba6b3]">AI (O)</div>
         </div>
+        <button onClick={startGame}
+          className="ml-4 text-xs px-3 py-1.5 border border-[#2a3140] text-[#9ba6b3] rounded-lg
+                     hover:border-[#3a4150] hover:text-[#e6edf3] transition-colors">
+          ↺ New Game
+        </button>
       </div>
 
       {/* Result banner */}
