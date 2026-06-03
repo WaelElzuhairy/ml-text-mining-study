@@ -1,28 +1,47 @@
 const API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 const MODEL = 'llama-3.3-70b-versatile'
 
+// Parse comma-separated keys from either the env var or a manually entered key
+function parseKeys(apiKey) {
+  const envKeys = import.meta.env.VITE_GROQ_KEY
+  const source = envKeys || apiKey
+  return source.split(',').map(k => k.trim()).filter(Boolean)
+}
+
 async function callGroq(apiKey, systemPrompt, userMessage, maxTokens = 1000) {
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: maxTokens,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userMessage },
-      ],
-    }),
-  })
-  if (!res.ok) {
+  const keys = parseKeys(apiKey)
+  let lastError = null
+
+  for (const key of keys) {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${key}`,
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: maxTokens,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage },
+        ],
+      }),
+    })
+
+    if (res.ok) {
+      const data = await res.json()
+      return data.choices[0].message.content
+    }
+
     const err = await res.json().catch(() => ({}))
-    throw new Error(err?.error?.message || `Groq API error ${res.status}`)
+    lastError = err?.error?.message || `Groq API error ${res.status}`
+
+    // Only rotate on rate limit (429), fail fast on auth errors (401)
+    if (res.status !== 429) break
   }
-  const data = await res.json()
-  return data.choices[0].message.content
+
+  throw new Error(lastError || 'All API keys exhausted')
 }
 
 // Generate crossword clues: returns [{term, clue}]
