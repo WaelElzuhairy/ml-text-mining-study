@@ -1,5 +1,5 @@
 const API_URL = 'https://api.groq.com/openai/v1/chat/completions'
-const MODEL = 'llama-3.3-70b-versatile'
+const MODEL = 'llama-3.1-8b-instant'
 
 // Parse comma-separated keys from either the env var or a manually entered key
 function parseKeys(apiKey) {
